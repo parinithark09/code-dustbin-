@@ -1,0 +1,36 @@
+#include <Servo.h>
+
+Servo myservo;  // create servo object to control a servo
+int irPin = 2;  // IR sensor connected to digital pin 2
+int waterPin = 3;  // water sensor connected to digital pin 3
+
+unsigned long previousMillis = 0;  // will store the last time the IR sensor was updated
+const long interval = 1500;  // the interval at which to read the IR sensor (1 second)
+
+void setup() {
+  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
+  pinMode(irPin, INPUT);  // sets the digital pin as input to read from the IR sensor
+  pinMode(waterPin, INPUT);  // sets the digital pin as input to read from the water sensor
+}
+
+void loop() {
+  unsigned long currentMillis = millis();  // get the current time
+  int waterDetect = digitalRead(waterPin);  // read the input from the water sensor
+
+  if (currentMillis - previousMillis >= interval) {  // if 1 second has passed
+    previousMillis = currentMillis;  // save the current time
+
+    if (waterDetect == HIGH) {  // if water sensor is triggered
+      myservo.write(150);  // move the servo to 150 degrees
+      delay(3000);  // wait for 2 seconds
+      myservo.write(80);  // return the servo to its initial position
+    } else {  // if water sensor is not triggered
+      int irDetect = digitalRead(irPin);  // read the input from the IR sensor
+      if (irDetect == LOW) {  // if IR sensor is triggered
+        myservo.write(20);  // move the servo to 0 degrees
+        delay(3000);  // wait for 2 seconds
+        myservo.write(80);  // return the servo to its initial position
+      }
+    }
+  }
+}
